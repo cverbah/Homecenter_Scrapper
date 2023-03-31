@@ -28,23 +28,25 @@ if __name__ == '__main__':
 
     url = 'https://sodimac.falabella.com/sodimac-cl'
     driver.get(url)
-    time.sleep(2)
+    time.sleep(3)
 
     #start scrapping
     skus_to_search = input_df[input_df.columns[0]].tolist()
-
     start = time.time()
-    print('\nscrapping..')
-    data = []
 
+    print('\nStarting...')
+    data = []
     with alive_bar(len(input_df), force_tty=True) as bar:
-        for index,sku in enumerate(skus_to_search, start=1):
+        for index, sku in enumerate(skus_to_search, start=1):
             time.sleep(0.005)
             print(f'\n\nextracting sku: {sku}')
+            try:
+                product_data = get_product_data(driver, sku)
+                data.append(product_data)
+                bar()
 
-            product_data = get_product_data(driver, sku)
-            data.append(product_data)
-            bar()
+            except Exception as e:
+                sys.exit(str(e))
 
     #save data
     df = pd.DataFrame(data)
@@ -62,3 +64,4 @@ if __name__ == '__main__':
     print(f'Average time per product: {avg_time} secs')
     print(f'Products Scrapped: {len(input_df)} products')
     print('------------------------------------')
+    print(f'file saved as: sodimac_scrapping_{date}.csv')
