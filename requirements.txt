@@ -1,0 +1,6 @@
+numpy==1.21.6
+pandas==1.2.4
+unicode==2.9
+selenium==3.141.0
+chromedriver-py==111.0.5563.19
+alive-progress==3.1.0
