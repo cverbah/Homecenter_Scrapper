@@ -1,4 +1,4 @@
-import pandas as pd
+#libraries
 import time
 import numpy as np
 import unidecode
