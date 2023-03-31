@@ -11,6 +11,6 @@ check that the <i>chromedriver-py</i> version is the same version you have insta
 
 ## How to use it
 
-1. Run `python -m pip install -r requirements.txt` to install the requirements. If you have a different chrome version, update it
-2  Run `python main.py path_to_excel_file`. Skus must be in the first column
+1. Run `python -m pip install -r requirements.txt` to install the requirements. If you have a different chrome version, update it <br>
+2  Run `python main.py path_to_excel_file`. Skus must be in the first column <br>
 3. A *.csv file saved with the data scraped.
