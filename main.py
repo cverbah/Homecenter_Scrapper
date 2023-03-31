@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     #save data
     df = pd.DataFrame(data)
-    df  = df[['sku', 'cod. tienda', 'descripcion', 'precio', 'tienda', 'stock_en_tienda', 'url', 'snapshot']]
+    df  = df[['sku', 'cod. tienda', 'descripcion', 'precio', 'stock_in_website', 'tienda', 'stock_en_tienda', 'url', 'snapshot']]
     date = time.strftime("%D", time.localtime())
     date = date.replace('/','_')
     df.to_csv(f'sodimac_scrapping_{date}.csv')
