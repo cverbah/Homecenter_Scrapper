@@ -15,6 +15,10 @@ def preprocess_text(text):
 
 
 def get_product_data(driver, sku):
+    '''get the info from the product. Currently some settings for Quillota (store_stock)
+       input: webdriver, sku
+       ouput: dictionary with product info
+    '''
     search_bar = driver.find_element(By.ID, "testId-SearchBar-Input")
     search_bar.click()
 
@@ -122,8 +126,8 @@ def get_product_data(driver, sku):
         product['stock_en_tienda'] = store_stock
 
     except:
-        product['Tienda'] = np.nan
-        product['Stock_en_tienda'] = np.nan
+        product['tienda'] = np.nan
+        product['stock_en_tienda'] = np.nan
 
     curr_time = time.strftime("%D %H:%M:%S", time.localtime())
     product['snapshot'] = curr_time
