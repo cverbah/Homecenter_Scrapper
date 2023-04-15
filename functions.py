@@ -41,43 +41,63 @@ def get_product_data(driver, sku):
     try:
         # check stock in website, sin stock
         check_stock_web = driver.find_element(By.ID, 'testId-product-outofstock')
-        price = driver.find_element(By.XPATH,
-                                    '/html/body/div[1]/div/section/div[1]/div[1]/div[2]/section[2]/div[3]/div/div[1]/div/ol/li').get_attribute(
-            'data-internet-price')
-        price = int(eval(price) * 1000)
-        product['precio'] = price
-        product['precio_dcto'] = np.nan
         product['stock_en_website'] = False
 
     except:
-        # check stock in website, con stock
-        try:
-            price = driver.find_element(By.XPATH,
-                                        '/html/body/div[1]/div/section/div[1]/div[1]/div[2]/section[2]/div[2]/div/div[2]/div[1]/div[1]/ol/li').get_attribute(
-                'data-internet-price')
-            price = int(eval(price) * 1000)
+        product['stock_en_website'] = True
+
+    # price
+    try:
+        class_name_prices = 'prices-4_GRID'
+        price_element = driver.find_element(By.CLASS_NAME, class_name_prices)
+
+        prices = price_element.text
+        prices = prices.replace('$','')
+        prices = prices.split()
+
+        if len(prices) == 1:
+            price = int(eval(prices[0]) * 1000)
             product['precio'] = price
             product['precio_dcto'] = np.nan
-            product['stock_en_website'] = True
+            product['precio_cmr'] = np.nan
 
-        except:
-            try:
-                #producto con descuento
-                price = driver.find_element(By.XPATH,'/html/body/div[1]/div/section/div[1]/div[1]/div[2]/section[2]/div[2]/div/div[2]/div[1]/div[1]/ol/li[2]').get_attribute(
-                'data-normal-price')
-                price = int(eval(price) * 1000)
-                price_dcto = driver.find_element(By.XPATH,'/html/body/div[1]/div/section/div[1]/div[1]/div[2]/section[2]/div[2]/div/div[2]/div[1]/div[1]/ol/li[1]').get_attribute(
-                'data-event-price')
-                price_dcto = int(eval(price_dcto) * 1000)
+        if len(prices) == 2: #porsiaca??
 
+            price, price_dcto = int(eval(prices[1]) * 1000), int(eval(prices[0]) * 1000)
+            product['precio'] = price
+            product['precio_dcto'] = price_dcto
+            product['precio_cmr'] = np.nan
+
+
+        if len(prices) == 3:
+            # buscar si cmr o no
+            class_name_aux = 'prices-0'
+            type_element = driver.find_element(By.CLASS_NAME, class_name_aux)
+
+            if type_element.get_attribute('data-event-price'):
+                price, dcto, price_dcto = int(eval(prices[2]) * 1000), str(prices[1]), int(eval(prices[0]) * 1000)
                 product['precio'] = price
                 product['precio_dcto'] = price_dcto
-                product['stock_en_website'] = True
+                product['precio_cmr'] = np.nan
 
-            except:
-                product['precio'] = np.nan
+            if type_element.get_attribute('data-cmr-price'):
+                price, dcto, price_cmr = int(eval(prices[2]) * 1000), str(prices[1]), int(eval(prices[0]) * 1000)
+                product['precio'] = price
                 product['precio_dcto'] = np.nan
-                product['stock_en_website'] = np.nan
+                product['precio_cmr'] = price_cmr
+
+
+        if len(prices) == 4:
+            price_cmr, price, price_dcto = int(eval(prices[0]) * 1000), int(eval(prices[3]) * 1000), int(eval(prices[2]) * 1000)
+            product['precio'] = price
+            product['precio_dcto'] = price_dcto
+            product['precio_cmr'] = price_cmr
+
+    except:
+        product['precio'] = np.nan
+        product['precio_dcto'] = np.nan
+        product['precio_cmr'] = np.nan
+        product['stock_en_website'] = np.nan
 
     # codigo_producto, codigo tienda
     codes = ['codigo del producto', 'cod. tienda']
@@ -104,52 +124,58 @@ def get_product_data(driver, sku):
             elif code_name not in list(product.keys()):
                 product[code_name] = np.nan
 
-    check_stock_store = driver.find_element(By.ID, 'testId-open-store-availability-modal-desktop')
     try:
-        check_stock_store.click()
+        check_stock_store = driver.find_element(By.ID, 'testId-open-store-availability-modal-desktop')
+        try:
+            check_stock_store.click()
 
-    except ElementClickInterceptedException:
+        except ElementClickInterceptedException:
 
-        driver.execute_script("arguments[0].click();", check_stock_store)
+            driver.execute_script("arguments[0].click();", check_stock_store)
 
-    # info de stock en tienda homecenter quillota
-    time.sleep(3)
-    region = driver.find_elements(By.CLASS_NAME, 'Autocomplete-module_autocomplete-input-wrapper__3WjSy')[0].click()
-    selected_region = driver.find_element(By.XPATH,
-                                          '//*[@id="zone_modal_wrap"]/div/div/div/div[2]/div[1]/div/div/ul/li[16]').click()
-    time.sleep(2)
+        # info de stock en tienda homecenter quillota
+        time.sleep(3)
+        region = driver.find_elements(By.CLASS_NAME, 'Autocomplete-module_autocomplete-input-wrapper__3WjSy')[0].click()
+        selected_region = driver.find_element(By.XPATH,
+                                              '//*[@id="zone_modal_wrap"]/div/div/div/div[2]/div[1]/div/div/ul/li[16]').click()
+        time.sleep(2)
 
-    comuna = driver.find_elements(By.CLASS_NAME, 'Autocomplete-module_autocomplete-input-wrapper__3WjSy')[1].click()
-    selected_comuna = driver.find_element(By.XPATH,
-                                          '//*[@id="zone_modal_wrap"]/div/div/div/div[2]/div[2]/div/div/ul/li[56]').click()
-    time.sleep(2)
+        comuna = driver.find_elements(By.CLASS_NAME, 'Autocomplete-module_autocomplete-input-wrapper__3WjSy')[1].click()
+        selected_comuna = driver.find_element(By.XPATH,
+                                              '//*[@id="zone_modal_wrap"]/div/div/div/div[2]/div[2]/div/div/ul/li[56]').click()
+        time.sleep(2)
 
-    #
-    check_stock_store = driver.find_element(By.ID, 'testId-select-stock')
-    try:
-        check_stock_store.click()
+        #
+        check_stock_store = driver.find_element(By.ID, 'testId-select-stock')
+        try:
+            check_stock_store.click()
 
-    except ElementClickInterceptedException:
+        except ElementClickInterceptedException:
 
-        driver.execute_script("arguments[0].click();", check_stock_store)
-    time.sleep(2)
+            driver.execute_script("arguments[0].click();", check_stock_store)
+        time.sleep(2)
 
-    try:
-        store_location = driver.find_element(By.XPATH, '//*[@id="testId-store-item"]/div[2]/div/p/span').text
-        product['tienda'] = preprocess_text(store_location)
-        store_stock = driver.find_element(By.XPATH, '//*[@id="testId-store-item"]/div[2]/p[2]').text
-        store_stock = int(store_stock.split(' ')[0])
-        product['stock_en_tienda'] = store_stock
+        try:
+            store_location = driver.find_element(By.XPATH, '//*[@id="testId-store-item"]/div[2]/div/p/span').text
+            product['tienda'] = preprocess_text(store_location)
+            store_stock = driver.find_element(By.XPATH, '//*[@id="testId-store-item"]/div[2]/p[2]').text
+            store_stock = int(store_stock.split(' ')[0])
+            product['stock_en_tienda'] = store_stock
+
+        except:
+            product['tienda'] = np.nan
+            product['stock_en_tienda'] = np.nan
+
+        # close window
+        driver.find_element(By.ID, 'testId-modal-close').click()
 
     except:
         product['tienda'] = np.nan
         product['stock_en_tienda'] = np.nan
 
+
     curr_time = time.strftime("%D %H:%M:%S", time.localtime())
     product['snapshot'] = curr_time
-
-    # close window
-    driver.find_element(By.ID, 'testId-modal-close').click()
 
     print(product)
     return product
