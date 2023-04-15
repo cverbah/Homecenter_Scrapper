@@ -36,10 +36,9 @@ def get_product_data(driver, sku):
         product['descripcion'] = preprocess_text(description)
     except:
         product['descripcion'] = np.nan
-
-    # price
+    
+    # check stock in website
     try:
-        # check stock in website, sin stock
         check_stock_web = driver.find_element(By.ID, 'testId-product-outofstock')
         product['stock_en_website'] = False
 
