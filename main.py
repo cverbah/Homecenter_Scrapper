@@ -23,6 +23,7 @@ if __name__ == '__main__':
     #Webdriver config to supress the error messages/logs
     options = webdriver.ChromeOptions()
     options.add_argument("start-maximized")
+    options.add_argument('disable-notifications') 
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(options=options, executable_path=binary_path)
 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
 
     #save data
     df = pd.DataFrame(data)
-    df = df[['sku', 'cod. tienda', 'descripcion', 'stock_en_website', 'precio', 'precio_dcto', 'tienda', 'stock_en_tienda', 'url', 'snapshot']]
+    df = df[['sku', 'cod. tienda', 'descripcion', 'stock_en_website', 'precio', 'precio_dcto', 'precio_cmr', 'tienda', 'stock_en_tienda', 'url', 'snapshot']]
     date = time.strftime("%D", time.localtime())
     date = date.replace('/', '_')
     df.to_csv(f'sodimac_scrapping_{date}.csv')
